@@ -1,10 +1,13 @@
-## Goal
 
-To bring Amazon Linux to wsl --list --online
+## How To Install via Import for x86_64
 
-## How To Install - Temporary
+    curl -O AL2023.wsl https://github.com/clarson/amazon-linux-wsl/releases/download/v1.0.0/AL2023.8.20250818.0-arm64.wsl
+    wsl --import AL2023 c:\WSL\ AL2023.wsl
 
-    wsl --import ...
+## How To Install via Import for x86_64
+
+    curl -O AL2023.wsl https://github.com/clarson/amazon-linux-wsl/releases/download/v1.0.0/AL2023.8.20250818.0-x86_64.wsl
+    wsl --import AL2023 c:\WSL\ AL2023.wsl
 
 ## ec2icon.svg
 
