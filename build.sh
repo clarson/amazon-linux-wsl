@@ -131,3 +131,9 @@ tar --numeric-owner --absolute-names -c * | \
   gzip --best > $LASTDIR/$BUILD_DISTRO-$BUILD_ARCH.wsl || exit 1
 
 cd $LASTDIR || exit 1
+
+if [ "$2" != "" ]
+then
+  shift
+  $0 $*
+fi
