@@ -1,29 +1,66 @@
 #/bin/bash
 
-#https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro
-
-#https://cdn.amazonlinux.com/al2023/os-images/latest/
-
-MYDISTRO=AL2023
-
-#URL="https://cdn.amazonlinux.com/al2023/os-images/2023.8.20250818.0/container-minimal-arm64/al2023-container-minimal-2023.8.20250818.0-arm64.tar.xz"
-URL="https://cdn.amazonlinux.com/al2023/os-images/2023.8.20250818.0/container-arm64/al2023-container-2023.8.20250818.0-arm64.tar.xz"
-XZFILE=$(echo $URL |sed -e 's:.*/::')
-ARCH=$(echo $URL | sed -e 's:.*-::' -e 's:\.tar\.xz::' )
-
-if [ "$ARCH" = "" ]
+if [ "$1" = "" ]
 then
-    echo Cannot determine ARCH from $XZFILE
-    exit 1
+  echo Configuration file required
+  exit 1
+fi
+
+if [ ! -f "$1" ]
+then
+  echo Cannot find configuration file: $1
+  exit 1
+fi
+
+source "$1" || exit 1
+
+if [ ! -f terminal-profile.json ] || [ ! -f wsl.conf ] || [ ! -f wsl-distribution.conf ] || [ ! -f ec2icon.svg ]
+then
+  echo Working directory does not contain all files to include in distro
+  exit 1
+fi
+
+if [ "$BUILD_URL" = "" ]
+then
+  echo BUILD_URL is a required configuration file variable
+  exit 1
+fi
+
+if [ "$BUILD_ARCH" = "" ]
+then
+  echo BUILD_ARCH is a required configuration file variable
+  exit 1
+fi
+
+if [ "$BUILD_DISTRO" = "" ]
+then
+  echo BUILD_DISTRO is a required configuration file variable
+  exit 1
+fi
+
+XZFILE=$(echo $BUILD_URL |sed -e 's:.*/::')
+
+if [ "$XZFILE" = "" ]
+then
+  echo Cannot determine XZFILE from $BUILD_URL
+  exit 1
+fi
+
+if ! type -P convert >/dev/null
+then
+  echo Cannot find convert. Please install ImageMagick
+  exit 1
 fi
 
 if [ "$USER" != "root" ]
 then
-    echo Must run as root
-    exit 1
+  echo Must run as root
+  exit 1
 fi
 
 LASTDIR="$PWD"
+
+[ ! -f "$BUILD_DISTRO-$BUILD_ARCH.wsl" ] || rm $BUILD_DISTRO-$BUILD_ARCH.wsl
 
 TEMP_DIR=$(mktemp -d -t $(basename $0).XXXXXX)
 
@@ -31,11 +68,11 @@ trap 'rm -rf "$TEMP_DIR"' EXIT
 
 echo TEMP_DIR: $TEMP_DIR
 
-cd $TEMP_DIR
+cd $TEMP_DIR || exit 1
 
 echo XZFILE: $XZFILE
 
-wget "$URL"
+wget "$BUILD_URL"
 
 if [ ! -f $XZFILE ]
 then
@@ -49,118 +86,48 @@ mkdir rootfs || exit 1
 cd rootfs || exit 1
 mkdir -p usr/lib/wsl || exit 1
 
+echo Extracting $XZFILE
+
 tar -xf ../$XZFILE || exit 1
 
-#[ ! -f etc/fstab ] || rm etc/fstab
+echo Adding adm group to sudoers
 
-mkdir -p etc/sudoers.d/
+mkdir -p etc/sudoers.d/ || exit 1
 
 echo '%adm	ALL=(ALL)	NOPASSWD: ALL' > etc/sudoers.d/adm
+chmod 400 etc/sudoers.d/adm || exit 1
 
-cat <<EOWD > etc/wsl-distribution.conf
-[oobe]
-command = /etc/oobe.sh
-defaultUid = 1000
-defaultName = $MYDISTRO
+echo Adding etc/wsl-distribution.conf
 
-[shortcut]
-enabled = false
+sed -e "s/{BUILD_DISTRO}/$BUILD_DISTRO/g" \
+  $LASTDIR/wsl-distribution.conf > etc/wsl-distribution.conf || exit 1
 
-[windowsterminal]
-enabled = true
-ProfileTemplate = /usr/lib/wsl/terminal-profile.json
-EOWD
+echo Adding etc/terminal-profile.json
 
-cat <<EOWP >usr/lib/wsl/terminal-profile.json
-{
-  "profiles": [
-    {
-      "antialiasingMode": "aliased",
-      "fontWeight": "bold",
-      "colorScheme": "Postmodern Tango Light"
-    }
-  ],
-  "schemes": [
-    {
-      "name": "Postmodern Tango Light",
-      "black": "#0C0C0C",
-      "red": "#C50F1F",
-      "green": "#13A10E",
-      "yellow": "#C19C00",
-      "blue": "#0037DA",
-      "purple": "#881798",
-      "cyan": "#3A96DD",
-      "white": "#CCCCCC",
-      "brightBlack": "#767676",
-      "brightRed": "#E74856",
-      "brightGreen": "#16C60C",
-      "brightYellow": "#F9F1A5",
-      "brightBlue": "#3B78FF",
-      "brightPurple": "#B4009E",
-      "brightCyan": "#61D6D6",
-      "brightWhite": "#F2F2F2"
-    }
-  ]
-}
-EOWP
+cp $LASTDIR/terminal-profile.json usr/lib/wsl/terminal-profile.json || exit 1
 
-cat <<EOWO >etc/oobe.sh
-#!/bin/bash
+echo Adding etc/oobe.sh
 
-set -ue
+cp $LASTDIR/oobe.sh etc/oobe.sh || exit 1
 
-DEFAULT_GROUPS='adm,cdrom'
-DEFAULT_UID='1000'
+chmod a+x etc/oobe.sh || exit 1
 
-[ -x /usr/sbin//usr/sbin/automount ] || dnf install -y autofs || exit 1
-[ -x /usr/sbin/adduser ] || dnf install -y shadow-utils || exit 1
-[ -x /usr/sbin/sudo ] || dnf install -y sudo || exit 1
+echo Adding etc/wsl.conf
 
-echo 'Please create a default UNIX user account. The username does not need to match your Windows username.'
-echo 'For more information visit: https://aka.ms/wslusers'
+cp $LASTDIR/wsl.conf etc/wsl.conf || exit 1
 
-if getent passwd "\$DEFAULT_UID" > /dev/null ; then
-  echo 'User account already exists, skipping creation'
-  exit 0
-fi
+echo Creating usr/lib/wsl/ec2.ico
 
-if [ ! -x /usr/sbin/adduser ]
-then
-    echo 'Cannot create users with out adduser command'
-    exit 0
-fi
+convert -density 256x256 -background transparent \
+  -define icon:auto-resize=256,128,96,64,48,32,16 $LASTDIR/ec2icon.svg usr/lib/wsl/ec2.ico
 
-while true; do
+echo Creating root/.bash_profile
+echo 'bash /etc/oobe.sh || exit 1' > root/.bash_profile
+chmod u+x root/.bash_profile
 
-  # Prompt from the username
-  read -p 'Enter new UNIX username: ' username
+echo Creating $BUILD_DISTRO-$BUILD_ARCH.wsl
 
-  # Create the user
-  if /usr/sbin/adduser --uid "\$DEFAULT_UID" "\$username"; then
+tar --numeric-owner --absolute-names -c * | \
+  gzip --best > $LASTDIR/$BUILD_DISTRO-$BUILD_ARCH.wsl || exit 1
 
-    if /usr/sbin/usermod "\$username" -aG "\$DEFAULT_GROUPS"; then
-      break
-    else
-      /usr/sbin/deluser "\$username"
-    fi
-  fi
-done
-EOWO
-
-chmod a+x etc/oobe.sh
-
-cat <<EOW > etc/wsl.conf
-[boot]
-systemd=false
-
-[automount]
-#enabled=false 
-mountFsTab=false
-
-EOW
-
-tar --numeric-owner --absolute-names -c  * | gzip --best > $LASTDIR/install.tar.gz
-
-cd $LASTDIR
-
-mv install.tar.gz $MYDISTRO-$ARCH.wsl
+cd $LASTDIR || exit 1
