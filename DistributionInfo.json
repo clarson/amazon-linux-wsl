@@ -1,0 +1,19 @@
+{
+    "ModernDistributions": {
+        "AmazonLinux": [
+            {
+                "Name": "AL2023",
+                "FriendlyName": "AmazonLinux AL2023",
+                "Default": true,
+                "Amd64Url": {
+                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/v1.0.0/AL2023.8.20250818.0-x86_64.wsl",
+                    "Sha256": "d18896d717b09ac2e0b7daedc4f4172ee59beffe0ddaac60ed1b0fd3346f7733"
+                },
+                "Arm64Url": {
+                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/v1.0.0/AL2023.8.20250818.0-arm64.wsl",
+                    "Sha256": "77c95768a71bf425405a1719c2814266fb19a0f820901327091e91ad761c717d"
+                }
+            }
+        ]
+    }
+}
