@@ -37,11 +37,11 @@ cat << EOM > DistributionInfo.json
                 "FriendlyName": "AmazonLinux 2023",
                 "Default": true,
                 "Amd64Url": {
-                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/$DISTRO_VERSION/AL2023-x86_64.wsl",
+                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/AL$DISTRO_VERSION/AL2023-x86_64.wsl",
                     "Sha256": "$BINARY_ARM_HASH"
                 },
                 "Arm64Url": {
-                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/$DISTRO_VERSION/AL2023-arm64.wsl",
+                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/AL$DISTRO_VERSION/AL2023-arm64.wsl",
                     "Sha256": "$BINARY_X86_HASH"
                 }
             }

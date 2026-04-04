@@ -6,12 +6,12 @@
                 "FriendlyName": "AmazonLinux 2023",
                 "Default": true,
                 "Amd64Url": {
-                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/2023.10.20260330.0/AL2023-x86_64.wsl",
-                    "Sha256": "f620db9ea67d0ce798049290f8c66d92f42f40d6f574a1a71af6fe30c7845274"
+                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/AL2023.10.20260330.0/AL2023-x86_64.wsl",
+                    "Sha256": "73f6aad737ac6a92326c0fac6a620d178bc510532f06313fd6005de6bf218ac1"
                 },
                 "Arm64Url": {
-                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/2023.10.20260330.0/AL2023-arm64.wsl",
-                    "Sha256": "7a1a93f672da637eb72af00170572369f87599128283a2c6550d8005cd7438b0"
+                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/AL2023.10.20260330.0/AL2023-arm64.wsl",
+                    "Sha256": "58f5389aa2172db262c22858115a3006252811cb2562604c30f10c0917a49819"
                 }
             }
         ]
