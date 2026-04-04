@@ -1,12 +1,10 @@
 #!/bin/bash
 
-THIS_VERSION=$1
-DISTRO_VERSION=$2
+DISTRO_VERSION=$1
 
-if [ "$THIS_VERSION" = "" ]
+if [ "$DISTRO_VERSION" = "" ]
 then
-    echo '"This"' version is required
-    exit 1
+    DISTRO_VERSION=$(curl -s -I https://cdn.amazonlinux.com/al2023/os-images/latest/ |grep -i location |cut -d '/' -f6)
 fi
 
 if [ "$DISTRO_VERSION" = "" ]
@@ -15,36 +13,35 @@ then
     exit 1
 fi
 
-if [ ! -f "$DISTRO_VERSION-arm64.wsl" ]
+if [ ! -f "AL2023-arm64.wsl" ]
 then
-    echo $DISTRO_VERSION-arm64.wsl not found
+    echo AL2023-arm64.wsl not found
     exit 1
 fi
 
-if [ ! -f "$DISTRO_VERSION-x86_64.wsl" ]
+if [ ! -f "AL2023-x86_64.wsl" ]
 then
-    echo $DISTRO_VERSION-x86_64.wsl not found
+    echo AL2023-x86_64.wsl not found
     exit 1
 fi
 
-SHORT_VERSION=$(sed -e 's/\..*//' <<<$DISTRO_VERSION)
-BINARY_ARM_HASH=$(sha256sum -b $DISTRO_VERSION-arm64.wsl |sed -e 's/\s\+.*//')
-BINARY_X86_HASH=$(sha256sum -b $DISTRO_VERSION-x86_64.wsl |sed -e 's/\s\+.*//')
+BINARY_ARM_HASH=$(sha256sum -b AL2023-arm64.wsl |sed -e 's/\s\+.*//')
+BINARY_X86_HASH=$(sha256sum -b AL2023-x86_64.wsl |sed -e 's/\s\+.*//')
 
 cat << EOM > DistributionInfo.json
 {
     "ModernDistributions": {
         "AmazonLinux": [
             {
-                "Name": "$SHORT_VERSION",
-                "FriendlyName": "AmazonLinux $SHORT_VERSION",
+                "Name": "AL2023",
+                "FriendlyName": "AmazonLinux 2023",
                 "Default": true,
                 "Amd64Url": {
-                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/$THIS_VERSION/$DISTRO_VERSION-x86_64.wsl",
+                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/$DISTRO_VERSION/AL2023-x86_64.wsl",
                     "Sha256": "$BINARY_ARM_HASH"
                 },
                 "Arm64Url": {
-                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/$THIS_VERSION/$DISTRO_VERSION-arm64.wsl",
+                    "Url": "https://github.com/clarson/amazon-linux-wsl/releases/download/$DISTRO_VERSION/AL2023-arm64.wsl",
                     "Sha256": "$BINARY_X86_HASH"
                 }
             }

@@ -2,17 +2,23 @@
 
 if [ "$1" = "" ]
 then
-  echo Configuration file required
+  echo arch required. Can be x86_64 or arm64
   exit 1
 fi
 
-if [ ! -f "$1" ]
+if [ "$1" != "x86_64" ] && [ "$1" != "arm64" ]
 then
-  echo Cannot find configuration file: $1
+  echo Invalid arch. Can be x86_64 or arm64
   exit 1
 fi
 
-source "$1" || exit 1
+BUILD_ARCH="$1"
+
+if [ "$USER" != "root" ]
+then
+  echo Must run as root
+  exit 1
+fi
 
 if [ ! -f terminal-profile.json ] || [ ! -f wsl.conf ] || [ ! -f wsl-distribution.conf ] || [ ! -f ec2icon.svg ]
 then
@@ -20,23 +26,7 @@ then
   exit 1
 fi
 
-if [ "$BUILD_URL" = "" ]
-then
-  echo BUILD_URL is a required configuration file variable
-  exit 1
-fi
-
-if [ "$BUILD_ARCH" = "" ]
-then
-  echo BUILD_ARCH is a required configuration file variable
-  exit 1
-fi
-
-if [ "$BUILD_DISTRO" = "" ]
-then
-  echo BUILD_DISTRO is a required configuration file variable
-  exit 1
-fi
+BUILD_VERSION=$(curl -s -I https://cdn.amazonlinux.com/al2023/os-images/latest/ |grep -i location |cut -d '/' -f6)
 
 if [ "$BUILD_VERSION" = "" ]
 then
@@ -44,6 +34,15 @@ then
   exit 1
 fi
 
+BUILD_DISTRO=AL2023
+CONTAINER="container"
+
+if [ "$BUILD_ARCH" = "arm64" ]
+then
+  CONTAINER="container-arm64"
+fi
+
+BUILD_URL="https://cdn.amazonlinux.com/al2023/os-images/$BUILD_VERSION/$CONTAINER/al2023-container-$BUILD_VERSION-$BUILD_ARCH.tar.xz"
 XZFILE=$(echo $BUILD_URL |sed -e 's:.*/::')
 
 if [ "$XZFILE" = "" ]
@@ -55,12 +54,6 @@ fi
 if ! type -P convert >/dev/null
 then
   echo Cannot find convert. Please install ImageMagick
-  exit 1
-fi
-
-if [ "$USER" != "root" ]
-then
-  echo Must run as root
   exit 1
 fi
 
@@ -80,8 +73,6 @@ echo XZFILE: $XZFILE
 echo TEMP_DIR: $TEMP_DIR
 
 cd $TEMP_DIR || exit 1
-
-echo XZFILE: $XZFILE
 
 wget "$BUILD_URL"
 
