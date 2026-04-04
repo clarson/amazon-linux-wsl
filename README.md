@@ -1,13 +1,7 @@
 
-## How To Install via wsl import for x86_64
-
-    curl -O AL2023.wsl https://github.com/clarson/amazon-linux-wsl/releases/latest/download/AL2023-x86_64.wsl
-    wsl --install --from-file AL2023.wsl --name AL2023
-
-## How To Install via wsl import for arm64
-
-    curl -O AL2023.wsl https://github.com/clarson/amazon-linux-wsl/releases/latest/download/AL2023-arm64.wsl
-    wsl --install --from-file AL2023.wsl --name AL2023
+## How To Install via powershell prompt
+    curl -O install.ps1 https://github.com/clarson/amazon-linux-wsl/blob/main/install.ps1
+    .\install.ps1
 
 ## ec2icon.svg
 

@@ -38,6 +38,12 @@ then
   exit 1
 fi
 
+if [ "$BUILD_VERSION" = "" ]
+then
+  echo BUILD_VERSION is a required configuration file variable
+  exit 1
+fi
+
 XZFILE=$(echo $BUILD_URL |sed -e 's:.*/::')
 
 if [ "$XZFILE" = "" ]
@@ -66,6 +72,11 @@ TEMP_DIR=$(mktemp -d -t $(basename $0).XXXXXX)
 
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
+echo BUILD_URL: $BUILD_URL
+echo BUILD_ARCH: $BUILD_ARCH
+echo BUILD_DISTRO: $BUILD_DISTRO
+echo BUILD_VERSION: $BUILD_VERSION
+echo XZFILE: $XZFILE
 echo TEMP_DIR: $TEMP_DIR
 
 cd $TEMP_DIR || exit 1
@@ -131,6 +142,8 @@ tar --numeric-owner --absolute-names -c * | \
   gzip --best > $LASTDIR/$BUILD_DISTRO-$BUILD_ARCH.wsl || exit 1
 
 cd $LASTDIR || exit 1
+
+echo Created $BUILD_DISTRO-$BUILD_ARCH.wsl "($BUILD_VERSION)"
 
 if [ "$2" != "" ]
 then

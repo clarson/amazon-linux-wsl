@@ -40,6 +40,13 @@ do
   fi
 done
 
+cat << EOF >> /etc/wsl.conf
+
+[user]
+default=$username
+
+EOF
+
 read -p 'Automount host file system on startup? ' autoyes
 
 if [ "$autoyes" = "y" ] || [ "$autoyes" = "Y" ]

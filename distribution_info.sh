@@ -21,7 +21,6 @@ then
     exit 1
 fi
 
-
 if [ ! -f "$DISTRO_VERSION-x86_64.wsl" ]
 then
     echo $DISTRO_VERSION-x86_64.wsl not found

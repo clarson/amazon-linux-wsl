@@ -1,6 +1,4 @@
 param (
-    [string]$AlWslVersion = "v1.1.0",
-    [string]$AlVersion = "2023.9.20250929.0",
     [string]$DistroName = "AL2023",
     [ValidateSet(1, 2)]
     [int]$WslVersion = 2
@@ -27,15 +25,15 @@ if ($LASTEXITCODE -eq 0) {
     exit 1
 }
 
-if (!Test-Path -Path $Env:TEMP/$DistroName.wsl) {
+if (!(Test-Path -Path $Env:TEMP/AL2023.wsl)) {
     $ProgressPreference = 'SilentlyContinue'
-    Invoke-WebRequest -Outfile $Env:TEMP/$DistroName.wsl `
-        -Uri https://github.com/clarson/amazon-linux-wsl/releases/download/$AlWslVersion/$AlVersion-$ARCH.wsl
+    Invoke-WebRequest -Outfile $Env:TEMP/AL2023.wsl `
+        -Uri https://github.com/clarson/amazon-linux-wsl/releases/latest/download/AL2023-$ARCH.wsl
 }
 
-if (!Test-Path -Path $Env:TEMP/$DistroName.wsl) {
-    Write-Host "$Env:TEMP/$DistroName.wsl not found"
+if (!(Test-Path -Path $Env:TEMP/AL2023.wsl)) {
+    Write-Host "$Env:TEMP/AL2023.wsl not found"
     exit 1
 }
 
-wsl --install --from-file $Env:TEMP/$DistroName.wsl --name $DistroName
+wsl --install --from-file $Env:TEMP/AL2023.wsl --name $DistroName --version $WslVersion
