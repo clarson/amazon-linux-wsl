@@ -1,13 +1,12 @@
 
-## How To Install via powershell prompt
+## How to install via powershell prompt
     curl -O install.ps1 https://github.com/clarson/amazon-linux-wsl/blob/main/install.ps1
     .\install.ps1
 
-## ec2icon.svg
-
-Provided by https://awsicons.dev/
-
 ## See Also
+
+### ec2icon.svg
+Provided by https://awsicons.dev/
 
 ### Information on building wsl distros
 https://learn.microsoft.com/en-us/windows/wsl/build-custom-distro
