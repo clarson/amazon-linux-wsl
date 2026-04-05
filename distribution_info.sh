@@ -28,6 +28,10 @@ fi
 BINARY_ARM_HASH=$(sha256sum -b AL2023-arm64.wsl |sed -e 's/\s\+.*//')
 BINARY_X86_HASH=$(sha256sum -b AL2023-x86_64.wsl |sed -e 's/\s\+.*//')
 
+echo Creating DistributionInfo.json with version $DISTRO_VERSION
+echo arm64 hash: $BINARY_ARM_HASH
+echo x86_64 hash: $BINARY_X86_HASH
+
 cat << EOM > DistributionInfo.json
 {
     "ModernDistributions": {

@@ -13,6 +13,7 @@ then
 fi
 
 BUILD_ARCH="$1"
+BUILD_VERSION="$2"
 
 if [ "$USER" != "root" ]
 then
@@ -26,11 +27,14 @@ then
   exit 1
 fi
 
-BUILD_VERSION=$(curl -s -I https://cdn.amazonlinux.com/al2023/os-images/latest/ |grep -i location |cut -d '/' -f6)
+if [ "$BUILD_VERSION" = "" ]
+then
+  BUILD_VERSION=$(curl -s -I https://cdn.amazonlinux.com/al2023/os-images/latest/ |grep -i location |cut -d '/' -f6)
+fi
 
 if [ "$BUILD_VERSION" = "" ]
 then
-  echo BUILD_VERSION is a required configuration file variable
+  echo "Cannot automatically determine latest build version. Please provide it as an argument."
   exit 1
 fi
 
@@ -135,9 +139,3 @@ tar --numeric-owner --absolute-names -c * | \
 cd $LASTDIR || exit 1
 
 echo Created $BUILD_DISTRO-$BUILD_ARCH.wsl "($BUILD_VERSION)"
-
-if [ "$2" != "" ]
-then
-  shift
-  $0 $*
-fi
