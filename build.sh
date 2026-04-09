@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ "$1" = "clean" ]
+then
+  echo Cleaning
+  rm AL2023-arm64.wsl  AL2023-x86_64.wsl  DistributionInfo.json
+  exit
+fi
+
 if [ "$1" = "" ]
 then
   echo arch required. Can be x86_64 or arm64
