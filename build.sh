@@ -3,7 +3,10 @@
 if [ "$1" = "clean" ]
 then
   echo Cleaning
-  rm AL2023-arm64.wsl  AL2023-x86_64.wsl  DistributionInfo.json
+  for file in AL2023-arm64.wsl AL2023-x86_64.wsl DistributionInfo.json
+  do
+      [ ! -f $file ] || rm $file
+  done
   exit
 fi
 
@@ -76,16 +79,21 @@ TEMP_DIR=$(mktemp -d -t $(basename $0).XXXXXX)
 
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
-echo BUILD_URL: $BUILD_URL
+echo
+echo -------- Building $BUILD_DISTRO-$BUILD_ARCH.wsl "($BUILD_VERSION)" --------
+echo
 echo BUILD_ARCH: $BUILD_ARCH
 echo BUILD_DISTRO: $BUILD_DISTRO
 echo BUILD_VERSION: $BUILD_VERSION
-echo XZFILE: $XZFILE
 echo TEMP_DIR: $TEMP_DIR
+echo XZFILE: $XZFILE
+echo BUILD_URL: $BUILD_URL
+echo
 
 cd $TEMP_DIR || exit 1
 
-wget "$BUILD_URL"
+echo Downloading $XZFILE
+wget -q "$BUILD_URL"
 
 if [ ! -f $XZFILE ]
 then
@@ -145,4 +153,5 @@ tar --numeric-owner --absolute-names -c * | \
 
 cd $LASTDIR || exit 1
 
+echo
 echo Created $BUILD_DISTRO-$BUILD_ARCH.wsl "($BUILD_VERSION)"
