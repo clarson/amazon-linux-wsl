@@ -5,6 +5,9 @@
 
 ## See Also
 
+### How to build these wsl files
+https://github.com/clarson/amazon-linux-wsl-builder
+
 ### ec2icon.svg
 Provided by https://awsicons.dev/
 
